@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var Q = require('q');
 var Backbone = require('backbone');
+var marked = require('marked');
 
 var Main = require('../app');
 var intl = require('../intl');
@@ -311,7 +312,7 @@ var ModalTerminal = ContainedBase.extend({
 
     this.container = new ModalView();
     this.JSON = {
-      title: options.title 
+      title: options.title
     };
 
     this.render();
@@ -356,7 +357,7 @@ var ModalAlert = ContainedBase.extend({
 
   render: function() {
     var HTML = (this.JSON.markdown) ?
-      require('markdown').markdown.toHTML(this.JSON.markdown) :
+      marked(this.JSON.markdown) :
       this.template(this.JSON);
     // one more hack -- allow adding custom random HTML if specified
     if (this.options._dangerouslyInsertHTML) {

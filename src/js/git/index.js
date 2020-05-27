@@ -686,7 +686,7 @@ GitEngine.prototype.validateAndMakeTag = function(id, target) {
     throw new GitError({
       msg: intl.str(
         'bad-tag-name',
-        { tag: name }
+        { tag: id }
       )
     });
   }
@@ -1665,7 +1665,7 @@ GitEngine.prototype.resolveStringRef = function(ref) {
   // Attempt to split ref string into a reference and a string of ~ and ^ modifiers.
   var startRef = null;
   var relative = null;
-  var regex = /^([a-zA-Z0-9]+)(([~\^]\d*)*)/;
+  var regex = /^([a-zA-Z0-9]+)(([~\^]\d*)*)$/;
   var matches = regex.exec(ref);
   if (matches) {
     startRef = matches[1];
@@ -2026,21 +2026,19 @@ GitEngine.prototype.idSortFunc = function(cA, cB) {
     throw new Error('Could not parse commit ID ' + id);
   };
 
+  // We usually want to sort by reverse chronological order, aka the
+  // "latest" commits have the highest values. When we did this
+  // with date sorting, that means the commit C1 at t=0 should have
+  // a lower value than the commit C2 at t=1. We do this by doing
+  // t0 - t1 and get a negative number. Same goes for ID sorting,
+  // which means C1 - C2 = -1
   return getNumToSort(cA.get('id')) - getNumToSort(cB.get('id'));
 };
 
 GitEngine.prototype.dateSortFunc = function(cA, cB) {
-  var dateA = new Date(cA.get('createTime'));
-  var dateB = new Date(cB.get('createTime'));
-  if (dateA - dateB === 0) {
-    // hmmmmm this still needs fixing. we need to know basically just WHEN a commit was created, but since
-    // we strip off the date creation field, when loading a tree from string this fails :-/
-    // there's actually no way to determine it...
-    //c.warn('WUT it is equal');
-    //c.log(cA, cB);
-    return GitEngine.prototype.idSortFunc(cA, cB);
-  }
-  return dateA - dateB;
+  // We used to use date sorting, but its hacky so lets switch to ID sorting
+  // to eliminate non-determinism
+  return GitEngine.prototype.idSortFunc(cA, cB);
 };
 
 GitEngine.prototype.hgRebase = function(destination, base) {
@@ -2740,37 +2738,26 @@ GitEngine.prototype.logWithout = function(ref, omitBranch) {
   this.log(ref, Graph.getUpstreamSet(this, omitBranch));
 };
 
-GitEngine.prototype.log = function(ref, omitSet) {
-  // omit set is for doing stuff like git log branchA ^branchB
-  omitSet = omitSet || {};
-  // first get the commit we referenced
-  var commit = this.getCommitFromRef(ref);
+GitEngine.prototype.revlist = function(refs) {
+  var range = new RevisionRange(this, refs);
 
-  // then get as many far back as we can from here, order by commit date
-  var toDump = [];
-  var pQueue = [commit];
+  // now go through and collect ids
+  var bigLogStr = range.formatRevisions(function(c) {
+    return c.id + '\n';
+  });
 
-  var seen = {};
+  throw new CommandResult({
+    msg: bigLogStr
+  });
+};
 
-  while (pQueue.length) {
-    var popped = pQueue.shift(0);
-    if (seen[popped.get('id')] || omitSet[popped.get('id')]) {
-      continue;
-    }
-    seen[popped.get('id')] = true;
-
-    toDump.push(popped);
-
-    if (popped.get('parents') && popped.get('parents').length) {
-      pQueue = pQueue.concat(popped.get('parents'));
-    }
-  }
+GitEngine.prototype.log = function(refs) {
+  var range = new RevisionRange(this, refs);
 
   // now go through and collect logs
-  var bigLogStr = '';
-  toDump.forEach(function (c) {
-    bigLogStr += c.getLogEntry();
-  }, this);
+  var bigLogStr = range.formatRevisions(function(c) {
+    return c.getLogEntry();
+  });
 
   throw new CommandResult({
     msg: bigLogStr
@@ -3078,6 +3065,102 @@ var Tag = Ref.extend({
     this.set('type', 'tag');
   }
 });
+
+function RevisionRange(engine, specifiers) {
+  this.engine = engine;
+  this.tipsToInclude = [];
+  this.tipsToExclude = [];
+  this.includedRefs = {};
+  this.excludedRefs = {};
+  this.revisions = [];
+
+  this.processSpecifiers(specifiers);
+}
+
+var rangeRegex = /^(.*)\.\.(.*)$/;
+
+RevisionRange.prototype.processAsRange = function(specifier) {
+  var match = specifier.match(rangeRegex);
+  if(!match) {
+    return false;
+  }
+  this.tipsToExclude.push(match[1]);
+  this.tipsToInclude.push(match[2]);
+  return true;
+};
+
+RevisionRange.prototype.processAsExclusion = function(specifier) {
+  if(!specifier.startsWith('^')) {
+    return false;
+  }
+  this.tipsToExclude.push(specifier.slice(1));
+  return true;
+};
+
+RevisionRange.prototype.processAsInclusion = function(specifier) {
+  this.tipsToInclude.push(specifier);
+  return true;
+};
+
+RevisionRange.prototype.processSpecifiers = function(specifiers) {
+  var self = this;
+  var processors = [
+    this.processAsRange,
+    this.processAsExclusion
+  ];
+
+  specifiers.forEach(function(specifier) {
+    if(!processors.some(function(processor) { return processor.bind(self)(specifier); })) {
+      self.processAsInclusion(specifier);
+    }
+  });
+
+  this.tipsToExclude.forEach(function(exclusion) {
+    self.addExcluded(Graph.getUpstreamSet(self.engine, exclusion));
+  });
+
+  this.tipsToInclude.forEach(function(inclusion) {
+    self.addIncluded(Graph.getUpstreamSet(self.engine, inclusion));
+  });
+
+  var includedKeys = Array.from(Object.keys(self.includedRefs));
+
+  self.revisions = includedKeys.map(function(revision) {
+    return self.engine.resolveStringRef(revision);
+  });
+  self.revisions.sort(self.engine.dateSortFunc);
+  self.revisions.reverse();
+};
+
+RevisionRange.prototype.isExcluded = function(revision) {
+  return this.excludedRefs.hasOwnProperty(revision);
+};
+
+RevisionRange.prototype.addExcluded = function(setToExclude) {
+  var self = this;
+  Object.keys(setToExclude).forEach(function(toExclude) {
+    if(!self.isExcluded(toExclude)) {
+      self.excludedRefs[toExclude] = true;
+    }
+  });
+};
+
+RevisionRange.prototype.addIncluded = function(setToInclude) {
+  var self = this;
+  Object.keys(setToInclude).forEach(function(toInclude) {
+    if(!self.isExcluded(toInclude)) {
+      self.includedRefs[toInclude] = true;
+    }
+  });
+};
+
+RevisionRange.prototype.formatRevisions = function(revisionFormatter) {
+  var output = "";
+  this.revisions.forEach(function(c) {
+    output += revisionFormatter(c);
+  });
+  return output;
+};
 
 exports.GitEngine = GitEngine;
 exports.Commit = Commit;

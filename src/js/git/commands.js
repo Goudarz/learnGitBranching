@@ -83,7 +83,7 @@ var assertOriginSpecified = function(generalArgs) {
   if (generalArgs[0] !== 'origin') {
     throw new GitError({
       msg: intl.todo(
-        generalArgs[0] + ' is not a remote in your repository! try adding origin that argument'
+        generalArgs[0] + ' is not a remote in your repository! try adding origin to that argument'
       )
     });
   }
@@ -574,25 +574,26 @@ var commandConfig = {
     }
   },
 
+  revlist: {
+    dontCountForGolf: true,
+    displayName: 'rev-list',
+    regex: /^git +rev-list($|\s)/,
+    execute: function(engine, command) {
+      var generalArgs = command.getGeneralArgs();
+      command.validateArgBounds(generalArgs, 1);
+
+      engine.revlist(generalArgs);
+    }
+  },
+
   log: {
     dontCountForGolf: true,
     regex: /^git +log($|\s)/,
     execute: function(engine, command) {
       var generalArgs = command.getGeneralArgs();
 
-      if (generalArgs.length == 2) {
-        // do fancy git log branchA ^branchB
-        if (generalArgs[1][0] == '^') {
-          engine.logWithout(generalArgs[0], generalArgs[1]);
-        } else {
-          throw new GitError({
-            msg: intl.str('git-error-options')
-          });
-        }
-      }
-
-      command.oneArgImpliedHead(generalArgs);
-      engine.log(generalArgs[0]);
+      command.impliedHead(generalArgs, 0);
+      engine.log(generalArgs);
     }
   },
 
@@ -810,8 +811,41 @@ var commandConfig = {
 
   tag: {
     regex: /^git +tag($|\s)/,
+    options: [
+      '-d'
+    ],
     execute: function(engine, command) {
       var generalArgs = command.getGeneralArgs();
+      var commandOptions = command.getOptionsMap();
+
+      if (commandOptions['-d']) {
+        var tagID = commandOptions['-d'];
+        var tagToRemove;
+
+        assertIsRef(engine, tagID);
+
+        command.oneArgImpliedHead(tagID);
+        engine.tagCollection.each(function(tag) {
+          if(tag.get('id') == tagID){
+            tagToRemove = tag;
+          }
+        }, true);
+
+        if(tagToRemove == undefined){
+          throw new GitError({
+            msg: intl.todo(
+              'No tag found, nothing to remove'
+            )
+          });
+        }
+
+        engine.tagCollection.remove(tagToRemove);
+        delete engine.refs[tagID];
+
+        engine.gitVisuals.refreshTree();
+        return;
+      }
+
       if (generalArgs.length === 0) {
         var tags = engine.getTags();
         engine.printTags(tags);

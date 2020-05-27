@@ -1,4 +1,9 @@
 exports.level = {
+  "compareAllBranchesAndEnforceBranchCleanup": true,
+  "disabledMap": {
+    "git branch": true,
+    "git checkout": true
+  },
   "goalTreeString": "{\"branches\":{\"master\":{\"target\":\"C1\",\"id\":\"master\",\"remoteTrackingBranchID\":\"o/master\"},\"o/master\":{\"target\":\"C1\",\"id\":\"o/master\",\"remoteTrackingBranchID\":null},\"bar\":{\"target\":\"C1\",\"id\":\"bar\",\"remoteTrackingBranchID\":null}},\"commits\":{\"C0\":{\"parents\":[],\"id\":\"C0\",\"rootCommit\":true},\"C1\":{\"parents\":[\"C0\"],\"id\":\"C1\"}},\"HEAD\":{\"target\":\"master\",\"id\":\"HEAD\"},\"originTree\":{\"branches\":{\"master\":{\"target\":\"C1\",\"id\":\"master\",\"remoteTrackingBranchID\":null}},\"commits\":{\"C0\":{\"parents\":[],\"id\":\"C0\",\"rootCommit\":true},\"C1\":{\"parents\":[\"C0\"],\"id\":\"C1\"}},\"HEAD\":{\"target\":\"master\",\"id\":\"HEAD\"}}}",
   "solutionCommand": "git push origin :foo;git fetch origin :bar",
   "startTree": "{\"branches\":{\"master\":{\"target\":\"C1\",\"id\":\"master\",\"remoteTrackingBranchID\":\"o/master\"},\"o/master\":{\"target\":\"C1\",\"id\":\"o/master\",\"remoteTrackingBranchID\":null},\"o/foo\":{\"target\":\"C1\",\"id\":\"o/foo\",\"remoteTrackingBranchID\":null}},\"commits\":{\"C0\":{\"parents\":[],\"id\":\"C0\",\"rootCommit\":true},\"C1\":{\"parents\":[\"C0\"],\"id\":\"C1\"}},\"HEAD\":{\"target\":\"master\",\"id\":\"HEAD\"},\"originTree\":{\"branches\":{\"master\":{\"target\":\"C1\",\"id\":\"master\",\"remoteTrackingBranchID\":null},\"foo\":{\"target\":\"C1\",\"id\":\"foo\",\"remoteTrackingBranchID\":null}},\"commits\":{\"C0\":{\"parents\":[],\"id\":\"C0\",\"rootCommit\":true},\"C1\":{\"parents\":[\"C0\"],\"id\":\"C1\"}},\"HEAD\":{\"target\":\"master\",\"id\":\"HEAD\"}}}",
@@ -7,6 +12,7 @@ exports.level = {
     "zh_CN": "没有 source 的 source",
     "zh_TW": "沒有 source",
     "es_AR": "Origen de nada",
+    "es_ES": "Origen de nada",
     "pt_BR": "Origem vazia",
     "gl"   : "Orixen de nada",
     "de_DE": "Die Quelle des Nichts",
@@ -14,13 +20,16 @@ exports.level = {
     "fr_FR": "Source de rien du tout",
     "ru_RU": "Пустой источник",
     "ko"   : "Source가 없다",
-    "uk"   : "Нема джерела"
+    "uk"   : "Нема джерела",
+    "vi"   : "Không có nguồn",
+    "sl_SI": "Izvor Ničesar"
   },
   "hint": {
     "en_US": "The branch command is disabled for this level so you'll have to use fetch!",
     "zh_CN": "本关的 branch 命令被禁用了，你只能用 fetch！",
     "zh_TW": "在本關卡中，不允許使用 branch 指令，因此你只能使用 fetch！",
     "es_AR": "El comando branch está deshabilitado para este nivel, así que ¡vas a tener que usar fetch!",
+    "es_ES": "El comando branch está deshabilitado para este nivel, así que ¡vas a tener que usar fetch!",
     "pt_BR": "O comando branch está desabilitado para este nível, então você terá de usar o fetch!",
     "gl"   : "O comando branch está deshabilitado para este nivel, entón terás que empregar o comando fetch!",
     "de_DE": "Der branch Befehl ist für diesen Level inaktiv, du musst also fetch benutzen",
@@ -29,6 +38,8 @@ exports.level = {
     "ru_RU": "Команда branch недоступна на этом упражнении, пользуйтесь командой fetch!",
     "ko"   : "branch 명령이 비활성화 되어있습니다. fetch를 사용해야 되요!",
     "uk"   : "Команда branch недоступна на цьому уроці, користуйся командою fetch!",
+    "vi"   : "Lệnh branch đã bị vô hiệu hóa ở cấp độ này nên bạn sẽ phải dùng fetch!",
+    "sl_SI": "Ukaz za branchanje je v tej stopnji onemogočen, zato boš moral uporabiti fetch!"
   },
   "startDialog": {
     "en_US": {
@@ -65,7 +76,7 @@ exports.level = {
           "type": "GitDemonstrationView",
           "options": {
             "beforeMarkdowns": [
-              "Finally, fetching \"nothing\" to a place locally actually makes a new branch"
+              "Finally, fetching \"nothing\" to a place locally actually makes a new branch."
             ],
             "afterMarkdowns": [
               "Very odd / bizarre, but whatever. That's git for you!"
@@ -145,7 +156,7 @@ exports.level = {
             "markdowns": [
               "### Rarezas de `<origen>`",
               "",
-              "Git abusa del parámetro `<origen>` de dos extrañas maneras. Estos dos abusos vienen del hecho de que tecnicamente podés especificar \"la nada\" como un `origen` válido tanto para git push como para git fetch. El modo de especificar la nada es a través de un parámetro vacío:",
+              "Git abusa del parámetro `<origen>` de dos extrañas maneras. Estos dos abusos vienen del hecho de que técnicamente podés especificar \"la nada\" como un `origen` válido tanto para git push como para git fetch. El modo de especificar la nada es a través de un parámetro vacío:",
               "",
               "* `git push origin :side`",
               "* `git fetch origin :bugFix`",
@@ -171,7 +182,7 @@ exports.level = {
           "type": "GitDemonstrationView",
           "options": {
             "beforeMarkdowns": [
-              "Finalmente, fetchear \"nada\" a un lugar local en realidad crea una nueva rama"
+              "Finalmente, fetchear \"nada\" a un lugar local en realidad crea una nueva rama."
             ],
             "afterMarkdowns": [
               "Bastante bizarro, pero, meh, da igual. Así es git."
@@ -185,6 +196,59 @@ exports.level = {
           "options": {
             "markdowns": [
               "Este es un nivel rápido: simplemente borrá una rama remota y creá una nueva usando `git fetch` para completarlo."
+            ]
+          }
+        }
+      ]
+    },
+    "es_ES": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "### Rarezas de `<origen>`",
+              "",
+              "Git abusa del parámetro `<origen>` de dos extrañas maneras. Estos dos abusos vienen del hecho de que técnicamente puedes especificar \"la nada\" como un `origen` válido tanto para git push como para git fetch. El modo de especificar la nada es a través de un parámetro vacío:",
+              "",
+              "* `git push origin :side`",
+              "* `git fetch origin :bugFix`",
+              "",
+              "Veamos qué hacen estos..."
+            ]
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "¿Qué hace el hacer push de \"nada\" a una rama remota? ¡La elimina!"
+            ],
+            "afterMarkdowns": [
+              "Ahí está, eliminamos la rama `foo` exitosamente del remoto haciendo push con \"nada\". Tiene algo de sentido..."
+            ],
+            "command": "git push origin :foo",
+            "beforeCommand": "git clone; git push origin master:foo"
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "Finalmente, hacer fetch de \"nada\" a un lugar local en realidad crea una nueva rama."
+            ],
+            "afterMarkdowns": [
+              "Bastante extraño, pero bueno, da igual. Así es git."
+            ],
+            "command": "git fetch origin :bar",
+            "beforeCommand": "git clone"
+          }
+        },
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "Este es un nivel breve: simplemente elimina una rama remota y crea una nueva usando `git fetch` para completarlo."
             ]
           }
         }
@@ -224,7 +288,7 @@ exports.level = {
           "type": "GitDemonstrationView",
           "options": {
             "beforeMarkdowns": [
-              "Finalmente, fazer um fetch de \"coisa nenhuma\" para uma referência local cria um novo ramo"
+              "Finalmente, fazer um fetch de \"coisa nenhuma\" para uma referência local cria um novo ramo."
             ],
             "afterMarkdowns": [
               "Bastante estranho / bizarro, mas de qualquer forma. É assim que o Git é!"
@@ -277,7 +341,7 @@ exports.level = {
           "type": "GitDemonstrationView",
           "options": {
             "beforeMarkdowns": [
-              "Finalmente, descargar a \"nada\" a un lugar local na realidade crea unha nova rama"
+              "Finalmente, descargar a \"nada\" a un lugar local na realidade crea unha nova rama."
             ],
             "afterMarkdowns": [
               "Bastante bizarro, pero, meh, da igual. Así é git."
@@ -609,6 +673,112 @@ exports.level = {
           "options": {
             "markdowns": [
               "Це швидкий рівень -- просто видали одну віддалену гілку і створи нову локальну гілку, використовуючи `git fetch`!"
+            ]
+          }
+        }
+      ]
+    },
+    "vi": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "### Sự kỳ quặc của `<nguồn>`",
+              "",
+              "Git lợi dụng tham số `<nguồn>` theo 2 cách khá dị.Hai cách lợi dụng này bắt nguồn từ thục tế là bạn có thể \"không chỉ định\" `nguồn` cho cả git push và git fetch. Bạn có thể làm điều này bằng cách để trống tham số như sau:",
+              "",
+              "* `git push origin :side`",
+              "* `git fetch origin :bugFix`",
+              "",
+              "Hãy xem thử 2 câu lệnh này làm việc gì..."
+            ]
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "Nếu ta đẩy \"không gì cả\" lên một nhánh từ xa thì nó sẽ làm gì? Nó xóa nhánh đó!"
+            ],
+            "afterMarkdowns": [
+              "Đó, ta đã xóa thành công nhánh `foo` trên kho chứa từ xa bằng cách đẩy \"không gì cả\" lên nó. Khá là hợp lý..."
+            ],
+            "command": "git push origin :foo",
+            "beforeCommand": "git clone; git push origin master:foo"
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "Cuối cùng, nạp \"không gì cả\" vào một kho chứa cục bộ thực tế sẽ tạo ra một nhánh mới"
+            ],
+            "afterMarkdowns": [
+              "Khá là quái và dị. Nhưng mà dó là những gì git làm!"
+            ],
+            "command": "git fetch origin :bar",
+            "beforeCommand": "git clone"
+          }
+        },
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "Ở cấp độ đơn giản này -- bạn chỉ cần xóa một nhánh từ xa và tạo ra một nhánh mới với `git fetch` để hoàn thành!"
+            ]
+          }
+        }
+      ]
+    },
+    "sl_SI": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "### Čudnosti `<izvora>`",
+              "",
+              "Git zlorablja `<izvor>` parameter na dva čudna načina. Te dve zlorabi nastaneta iz dejstva, da lahko tehnično določiš \"nič\" kot veljaven `izvor` za git push in git fetch. Način, da določiš nič je z uporabo praznega argumenta:",
+              "",
+              "* `git push origin :side`",
+              "* `git fetch origin :bugFix`",
+              "",
+              "Poglejmo, kaj to naredi ..."
+            ]
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "Kaj naredi pushanje \"ničesar\" na oddaljen branch? Izbriše ga!"
+            ],
+            "afterMarkdowns": [
+              "Tako, uspešno smo izbrisali `foo` branch na oddaljenem repotu s konceptom pushanja \"ničesar\" nanj. To ima nekako smisel ..."
+            ],
+            "command": "git push origin :foo",
+            "beforeCommand": "git clone; git push origin master:foo"
+          }
+        },
+        {
+          "type": "GitDemonstrationView",
+          "options": {
+            "beforeMarkdowns": [
+              "In končno, fetchanje \"ničesar\" lokalno dejansko naredi nov branch."
+            ],
+            "afterMarkdowns": [
+              "Zelo čudno / bizarno, ampak kakorkoli. Tak je git!"
+            ],
+            "command": "git fetch origin :bar",
+            "beforeCommand": "git clone"
+          }
+        },
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "To je hitra stopnja -- samo izbriši en oddaljen branch in naredi novega z `git fetch`, da zaključiš!"
             ]
           }
         }

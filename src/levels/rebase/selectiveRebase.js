@@ -12,19 +12,23 @@ exports.level = {
     "fr_FR": "Branche spaghetti",
     "de_DE": "Branch-Spaghetti",
     "es_AR": "Enslada de branches",
+    "es_ES": "Ensalada de ramas",
     "pt_BR": "Espaguete de ramos",
     "gl"   : "Espaguete de ramas",
     "ja": "ブランチスパゲッティ",
     "zh_CN": "纠缠不清的分支",
     "zh_TW": "branch 漿糊",
     "ru_RU": "Спутанные ветки",
-    "uk"   : "Макарони з гілок"
+    "uk"   : "Макарони з гілок",
+    "vi"   : "Nhánh rối như canh hẹ",
+    "sl_SI": "Špageti iz Branchev"
   },
   "hint": {
     "en_US": "Make sure to do everything in the proper order! Branch one first, then two, then three",
     "fr_FR": "Faites attention à tout faire dans le bon ordre ! La branche one d'abord, puis la seconde, puis la troisième",
     "de_DE": "Stelle sicher, dass du alles in der richtigen Reihenfolge machst! Branche erst one, dann two, dann three.",
     "es_AR": "¡Asegurate de hacer las cosas en el orden correcto! Brancheá `one` primero, después `two`, y después `three`.",
+    "es_ES": "¡Asegúrate de hacer las cosas en el orden correcto! Crea primero la rama `one`, después `two`, y después `three`.",
     "pt_BR": "Certifique-se de fazer tudo na ordem correta! Crie o ramo `one` primeiro, depois `two`, depois `three`.",
     "gl"   : "¡Afiánzate de facer as cousas no orde correcto! Crea ramas `one` de primeiras, e logo `two` e `three`.",
     "ja": "全て正しい順番で処理すること！oneが最初で、次がtwo、最後にthreeを片付ける。",
@@ -32,7 +36,9 @@ exports.level = {
     "zh_CN": "确保你是按照正确的顺序来操作！先操作分支 `one`, 然后 `two`, 最后才是 `three`",
     "zh_TW": "確認你是按照正確的順序來操作！先操作 branch  `one`, 然後 `two`, 最後才是 `three`",
     "ru_RU": "Убедись, что у нас всё по порядку! Сначала ветка `one`, потом `two` и только потом `three`",
-    "uk":    "Переконайся, що все йде за порядком! Спершу гілка `one`, потім `two`, і тільки потім `three`"
+    "uk":    "Переконайся, що все йде за порядком! Спершу гілка `one`, потім `two`, і тільки потім `three`",
+    "vi":    "Hãy chắc chắn rằng bạn làm đúng thứ tự! Nhánh `one` trước, rồi `two`, rồi mới đến `three`",
+    "sl_SI": "Glej da boš vse opravil v pravilnem vrstnem redu! Najprej branch ena, nato pa dva in tri."
   },
   "startDialog": {
     "en_US": {
@@ -90,6 +96,26 @@ exports.level = {
               "La rama `one` necesita reordenarse, y eliminar `C5`. `two` necesita sólo reordenamiento, y `three` ¡sólo necesita un commit!",
               "",
               "Te vamos a dejar darte cuenta cómo resolver este -- asegurate de mirar la solución, después, usando `show solution`. "
+            ]
+          }
+        }
+      ]
+    },
+    "es_ES": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "## Ensalada de ramas",
+              "",
+              "¡Vaya, vaya! Tenemos un _pequeño_ objetivo al que llegar en este nivel.",
+              "",
+              "La rama `master` se encuentra algunos commits por delante de `one`, `two` y `three`. Por alguna razón, necesitamos actualizar esas tres ramas con versiones modificadas de los últimos commits de master.",
+              "",
+              "La rama `one` necesita reordenarse, y eliminar `C5`. `two` necesita sólo reordenamiento, y `three` ¡sólo necesita un commit!",
+              "",
+              "Vamos a dejar que intentes resolver este -- asegúrate de mirar la solución, después, usando `show solution`. "
             ]
           }
         }
@@ -274,6 +300,45 @@ exports.level = {
           }
         }
       ]
-    }
+    },
+    "vi": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "## Nhánh rối như canh hẹ",
+              "",
+              "Chààà, anh bạn! Thử thách lần này hơi khoai đây.",
+              "",
+              "Hiện tại thì nhánh `master` đang có nhiều commit hơn các nhánh `one`, `two` và `three`. Vì một lý do nào đó, ta cần cập nhật những commit trên nhánh `master` lên các nhánh còn lại kèm với một vài điều chỉnh .",
+              "",
+              "Nhánh `one` thì cần sắp xếp lại và xóa commit `C5`, trong khi đó nhánh `two` thì đơn giản sắp xếp, còn `three` thì chỉ cần một commit!",
+              "",
+              "Cố gắng động não tìm ra cách đi nhé -- khi bạn làm xong thì nhớ so sánh với đáp án của chúng tôi bằng lệnh `show solution`. "
+            ]
+          }
+        }
+      ]
+    },"sl_SI": {
+      "childViews": [
+        {
+          "type": "ModalAlert",
+          "options": {
+            "markdowns": [
+              "## Špageti iz Branchev",
+              "",
+              "WOAHHHhhh Miško! Ta stopnja bo pa pravi izziv.",
+              "",
+              "Tu imamo `master`, ki je nekaj commitov pred branchi `one`, `two` in `three`. Iz neznanega razloga moramo posodobiti te tri druge branche z modificiranimi različicami zadnjih nekaj commitov na masterju.",
+              "",
+              "Branch `one` potrebuje prerazporeditev in izbris `C5`. `two` rabi samo prerazporeditev, `three` pa potrebuje samo en commit!",
+              "",
+              "Prepustili ti bomo, da sam ugotoviš, kako tole rešiti -- vseeno lahko na koncu preveriš našo rešitev s `show solution`. "
+            ]
+          }
+        }
+      ]
+    },
   }
 };
